@@ -19,6 +19,12 @@
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="ticTacToeBackground" translatesAutoresizingMaskIntoConstraints="NO" id="tV5-Im-YKP">
                                 <rect key="frame" x="26" y="75" width="322" height="322"/>
                             </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="X" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="akp-dH-7EJ">
+                                <rect key="frame" x="240" y="191" width="89" height="89"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="45"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="X" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="o4N-6H-DoC">
                                 <rect key="frame" x="143" y="289" width="89" height="89"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="45"/>
@@ -73,8 +79,8 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="X" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="akp-dH-7EJ">
-                                <rect key="frame" x="240" y="191" width="89" height="89"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="X" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hni-bA-lNe">
+                                <rect key="frame" x="143" y="480" width="89" height="89"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="45"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
@@ -84,6 +90,7 @@
                         <gestureRecognizers/>
                         <connections>
                             <outletCollection property="gestureRecognizers" destination="riS-CA-UH5" appends="YES" id="WuP-sj-GYW"/>
+                            <outletCollection property="gestureRecognizers" destination="Jvb-fu-ifA" appends="YES" id="cjj-CH-pKp"/>
                         </connections>
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
@@ -97,6 +104,7 @@
                         <outlet property="labelSix" destination="akp-dH-7EJ" id="qQr-b6-C2m"/>
                         <outlet property="labelThree" destination="sfO-Sk-8If" id="lDU-V3-cBn"/>
                         <outlet property="labelTwo" destination="1b5-7w-xju" id="a5M-YK-u0y"/>
+                        <outlet property="labelXOToDrag" destination="hni-bA-lNe" id="ual-wL-XMW"/>
                         <outlet property="whichPlayerLabel" destination="e9A-MP-Q01" id="1KM-xh-MhG"/>
                     </connections>
                 </viewController>
@@ -107,6 +115,12 @@
                         <outlet property="delegate" destination="vXZ-lx-hvc" id="pyM-8u-k5b"/>
                     </connections>
                 </tapGestureRecognizer>
+                <panGestureRecognizer minimumNumberOfTouches="1" id="Jvb-fu-ifA" userLabel="Pan Gesture For Dragging XO Label">
+                    <connections>
+                        <action selector="onDrag:" destination="vXZ-lx-hvc" id="bkC-EI-wSf"/>
+                        <outlet property="delegate" destination="vXZ-lx-hvc" id="j8w-dE-ohk"/>
+                    </connections>
+                </panGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="439.5" y="388.5"/>
         </scene>

@@ -7,7 +7,7 @@
 //
 #import "ViewController.h"
 
-@interface ViewController ()
+@interface ViewController () <UIAlertViewDelegate>
 @property (weak, nonatomic) IBOutlet UILabel *labelOne;
 @property (weak, nonatomic) IBOutlet UILabel *labelTwo;
 @property (weak, nonatomic) IBOutlet UILabel *labelThree;
@@ -18,9 +18,11 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelEight;
 @property (weak, nonatomic) IBOutlet UILabel *labelNine;
 @property (weak, nonatomic) IBOutlet UILabel *whichPlayerLabel;
+@property (weak, nonatomic) IBOutlet UILabel *labelXOToDrag;
 @property (strong, nonatomic) NSMutableArray *ticTacToeBoard;
 @property (strong, nonatomic) NSArray *labelsArray;
 @property int mostRecentlyTappedSquare;
+@property CGPoint originalCenterPointForDraggableXOLabel;
 
 @end
 
@@ -37,6 +39,8 @@
     self.labelSeven.text = @"  ";
     self.labelEight.text = @"  ";
     self.labelNine.text  = @"  ";
+
+    self.originalCenterPointForDraggableXOLabel = self.labelXOToDrag.center;
 
     self.labelsArray = [[NSArray alloc] init];
     self.labelsArray = @[self.labelOne, self.labelTwo, self.labelThree, self.labelFour, self.labelFive, self.labelSix, self.labelSeven, self.labelEight, self.labelNine];
@@ -84,19 +88,27 @@
             // Player one's turn
             tappedLabel.text = @"X";
             tappedLabel.textColor = [UIColor blueColor];
-            self.whichPlayerLabel.text = @"Player Two";
+            [self updateWhichPlayerLabel:@"Player Two"];
             NSString *winner = [self whoWon];
-            NSLog(@"%@", winner);
+            if ([winner isEqualToString:@"x"]) {
+                [self showWinnerAlert:winner];
+            }
         }
         else {
             // Player two's turn
             tappedLabel.text = @"O";
             tappedLabel.textColor = [UIColor redColor];
-            self.whichPlayerLabel.text = @"Player One";
+            [self updateWhichPlayerLabel: @"Player One"];
             NSString *winner = [self whoWon];
-            NSLog(@"%@", winner);
+            if ([winner isEqualToString:@"o"]) {
+                [self showWinnerAlert:winner];
+            }
         }
     }
+}
+
+- (void)updateWhichPlayerLabel: (NSString *)player {
+    self.whichPlayerLabel.text = player;
 }
 
 - (void)getIndexOfTappedSquare: (UILabel *)tappedLabel {
@@ -143,6 +155,19 @@
     }
 
     return winner;
+}
+
+- (void)showWinnerAlert: (NSString *)winner {
+    UIAlertView *alertView = [[UIAlertView alloc] init];
+    alertView.delegate = self;
+    if ([winner isEqualToString:@"x"]) {
+        alertView.title = @"Player One Wins!";
+    } else if ([winner isEqualToString:@"o"]) {
+        alertView.title = @"Player Two Wins!";
+    }
+    [alertView addButtonWithTitle:@"New Game"];
+
+    [alertView show];
 }
 
 - (NSString *)checkWhichPlayerWon: (NSString *)player playerNumberString:(NSString *)playerNumberString {
@@ -212,6 +237,41 @@
     } else {
         return playerToCheck = @"";
     }
+}
+
+- (void)alertView: (UIAlertView *)alertView clickedButtonAtIndex: (NSInteger)buttonIndex {
+    if (buttonIndex == 0){
+        [self resetBoard];
+    }
+}
+
+- (void)resetBoard {
+        int counter = 0;
+
+        for (UILabel *label in self.labelsArray) {
+            label.text = @"  ";
+            self.ticTacToeBoard[counter] = @"0";
+            [self updateWhichPlayerLabel:@"Player One"];
+            counter++;
+        }
+}
+
+- (IBAction)onDrag:(UIPanGestureRecognizer *)panGesture {
+    CGPoint point = [panGesture locationInView:self.view];
+    self.labelXOToDrag.center = point;
+
+    if (panGesture.state == UIGestureRecognizerStateEnded) {
+        [UIView animateWithDuration:1.0 animations:^{
+            self.labelXOToDrag.center = self.originalCenterPointForDraggableXOLabel;
+        }];
+    }
+//    else {
+//        if (CGRectContainsPoint(self.thePreCogs.frame, point)) {
+//            self.labelXOToDrag.backgroundColor = [UIColor redColor];
+//            self.labelXOToDrag.text = @"A ficticious and incriminating future";
+//            [self.labelXOToDrag sizeToFit];
+//        }
+//    }
 }
 
 - (void)didReceiveMemoryWarning {
