@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 Taylor Wright-Sanson. All rights reserved.
 //
 #import "ViewController.h"
+#import "HelpWebViewController.h"
 
 const int kTurnTimerValue = 10;
 
@@ -412,7 +413,7 @@ const int kTurnTimerValue = 10;
     self.turnTimerCounter = kTurnTimerValue;
     self.turnTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
                                                       target:self
-                                                    selector:@selector(turnCountdown:)
+                                                    selector:@selector(turnCountdown)
                                                     userInfo:nil
                                                      repeats:YES];
 }
@@ -429,7 +430,7 @@ const int kTurnTimerValue = 10;
     self.timerLabel.text = [NSString stringWithFormat:@"%i", kTurnTimerValue];
 }
 
-- (void)turnCountdown: (id)sender {
+- (void)turnCountdown {
     if (self.turnTimerCounter == 0) {
         if (self.turnTimer) {
             [self stopTurnTimer];
@@ -453,10 +454,16 @@ const int kTurnTimerValue = 10;
         [self updateLabelXOToDrag];
     }
 }
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (IBAction)onHelpedButtonPressed:(id)sender {
+    HelpWebViewController *helpWebViewController = [[HelpWebViewController alloc] init];
+    //[self presentViewController:helpWebViewController animated:NO completion:nil];
+    UIStoryboardSegue *helpSeque = [[UIStoryboardSegue alloc] initWithIdentifier:@"helpSeque" source:self destination:helpWebViewController];
+    [self prepareForSegue:helpSeque sender:self];
 }
+
+//- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+//    [self]
+//}
+
 
 @end

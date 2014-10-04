@@ -14,6 +14,7 @@
 		34C44B6219DDF74B00E2A528 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 34C44B6119DDF74B00E2A528 /* Images.xcassets */; };
 		34C44B6519DDF74B00E2A528 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 34C44B6319DDF74B00E2A528 /* LaunchScreen.xib */; };
 		34C44B7119DDF74C00E2A528 /* TicTacToeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 34C44B7019DDF74C00E2A528 /* TicTacToeTests.m */; };
+		34C44B7C19DF8F9E00E2A528 /* HelpWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34C44B7B19DF8F9E00E2A528 /* HelpWebViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +41,8 @@
 		34C44B6A19DDF74C00E2A528 /* TicTacToeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TicTacToeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		34C44B6F19DDF74C00E2A528 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		34C44B7019DDF74C00E2A528 /* TicTacToeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TicTacToeTests.m; sourceTree = "<group>"; };
+		34C44B7A19DF8F9E00E2A528 /* HelpWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelpWebViewController.h; sourceTree = "<group>"; };
+		34C44B7B19DF8F9E00E2A528 /* HelpWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelpWebViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +88,8 @@
 				34C44B5919DDF74B00E2A528 /* AppDelegate.m */,
 				34C44B5B19DDF74B00E2A528 /* ViewController.h */,
 				34C44B5C19DDF74B00E2A528 /* ViewController.m */,
+				34C44B7A19DF8F9E00E2A528 /* HelpWebViewController.h */,
+				34C44B7B19DF8F9E00E2A528 /* HelpWebViewController.m */,
 				34C44B5E19DDF74B00E2A528 /* Main.storyboard */,
 				34C44B6119DDF74B00E2A528 /* Images.xcassets */,
 				34C44B6319DDF74B00E2A528 /* LaunchScreen.xib */,
@@ -219,6 +224,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34C44B7C19DF8F9E00E2A528 /* HelpWebViewController.m in Sources */,
 				34C44B5D19DDF74B00E2A528 /* ViewController.m in Sources */,
 				34C44B5A19DDF74B00E2A528 /* AppDelegate.m in Sources */,
 				34C44B5719DDF74B00E2A528 /* main.m in Sources */,
@@ -412,6 +418,7 @@
 				34C44B7619DDF74C00E2A528 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		34C44B7719DDF74C00E2A528 /* Build configuration list for PBXNativeTarget "TicTacToeTests" */ = {
 			isa = XCConfigurationList;
@@ -420,6 +427,7 @@
 				34C44B7919DDF74C00E2A528 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

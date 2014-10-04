@@ -98,6 +98,16 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NtQ-Ut-pJx">
+                                <rect key="frame" x="337" y="618" width="22" height="22"/>
+                                <state key="normal">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="onHelpedButtonPressed:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="7tX-gL-UvN"/>
+                                    <segue destination="blJ-vV-vZa" kind="presentation" identifier="helpSegue" id="xvc-Dc-qdX"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <gestureRecognizers/>
@@ -138,6 +148,54 @@
                 </panGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="439.5" y="388.5"/>
+        </scene>
+        <!--Help Web View Controller-->
+        <scene sceneID="6VQ-rC-2fw">
+            <objects>
+                <viewController id="blJ-vV-vZa" customClass="HelpWebViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="85V-9o-58j"/>
+                        <viewControllerLayoutGuide type="bottom" id="mU4-Kl-n7k"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="09X-pD-hVN">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <navigationBar contentMode="scaleToFill" fixedFrame="YES" translucent="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aEz-dy-TB0">
+                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <color key="barTintColor" red="0.29565753280000001" green="0.78252330800000003" blue="0.78027794260000005" alpha="1" colorSpace="calibratedRGB"/>
+                                <textAttributes key="titleTextAttributes">
+                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="deviceRGB"/>
+                                </textAttributes>
+                                <items>
+                                    <navigationItem title="Tic Tac Toe Help" id="6Fb-o5-5ic">
+                                        <barButtonItem key="rightBarButtonItem" title="Close" id="vLZ-Fa-wyU">
+                                            <connections>
+                                                <action selector="onPressCloseButton:" destination="blJ-vV-vZa" id="HkF-nc-IqH"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                            </navigationBar>
+                            <webView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="D1r-Gn-bA8">
+                                <rect key="frame" x="0.0" y="72" width="375" height="595"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="delegate" destination="blJ-vV-vZa" id="zOQ-8O-hrF"/>
+                                </connections>
+                            </webView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
+                    <connections>
+                        <outlet property="navBar" destination="aEz-dy-TB0" id="hLB-Hq-cB9"/>
+                        <outlet property="webView" destination="D1r-Gn-bA8" id="Fhd-IO-fAs"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="PxO-oL-hG1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="922.5" y="388.5"/>
         </scene>
     </scenes>
     <resources>
