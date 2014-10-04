@@ -7,6 +7,8 @@
 //
 #import "ViewController.h"
 
+const int kTurnTimerValue = 10;
+
 @interface ViewController () <UIAlertViewDelegate>
 @property (weak, nonatomic) IBOutlet UILabel *labelOne;
 @property (weak, nonatomic) IBOutlet UILabel *labelTwo;
@@ -23,6 +25,15 @@
 @property (strong, nonatomic) NSArray *labelsArray;
 @property int mostRecentlyTappedSquare;
 @property CGPoint originalCenterPointForDraggableXOLabel;
+
+@property BOOL hasGameBegun;
+@property BOOL isTurnTimedGame;
+
+@property NSTimer *turnTimer;
+@property int turnTimerCounter;
+
+@property (weak, nonatomic) IBOutlet UISegmentedControl *gameTimerSegmentedControl;
+@property (weak, nonatomic) IBOutlet UILabel *timerLabel;
 
 @end
 
@@ -47,28 +58,53 @@
 
     self.ticTacToeBoard = [[NSMutableArray alloc] initWithArray:@[@"0",@"0",@"0",@"0",@"0",@"0",@"0",@"0",@"0"]];
 
-    //NSLog(@"%@", self.ticTacToeBoard);
+    self.labelXOToDrag.textColor = [UIColor blueColor];
 
     self.mostRecentlyTappedSquare = 0;
 
     // Set player initial player
     self.whichPlayerLabel.text = @"Player One";
+    self.timerLabel.text = [NSString stringWithFormat:@"%i", kTurnTimerValue];
+
+    self.hasGameBegun = NO;
+    self.isTurnTimedGame = NO;
+
+    self.turnTimerCounter = kTurnTimerValue;
+
+    [self.gameTimerSegmentedControl addTarget:self
+                                       action:@selector(gameTimerSegmentedControlChanged:)
+                             forControlEvents:UIControlEventValueChanged];
+    self.timerLabel.alpha = 0.0;
+}
+
+- (void)gameTimerSegmentedControlChanged: (id)sender {
+    if (self.gameTimerSegmentedControl.selectedSegmentIndex == 0) {
+        //Turn off Timer
+
+    }
+    else
+    {
+        [self startTurnTimer];
+        self.gameTimerSegmentedControl.enabled = NO;
+        [UIView animateWithDuration:1.0 animations:^{
+            self.timerLabel.alpha = 1.0;
+        }];
+    }
 }
 
 - (UILabel *)findLabelUsingPoint:(CGPoint)point
 {
     UILabel *tappedLabel;
-    //int counter = 0;
     for (UILabel *label in self.labelsArray)
     {
         if (CGRectContainsPoint(label.frame, point))
         {
             tappedLabel = label;
-          //  self.mostRecentlyTappedSquare = counter;
+            if (!self.hasGameBegun) {
+                self.hasGameBegun = YES;
+            }
         }
-        //counter++;
     }
-    //[self updateTicTacToeBoardArray:self.mostRecentlyTappedSquare];
     return tappedLabel;
 }
 
@@ -83,15 +119,20 @@
 
     if ([tappedLabel.text isEqualToString:@"  "]) {
         [self getIndexOfTappedSquare:tappedLabel];
-
+        //[self startTurnTimer];
         if ([self.whichPlayerLabel.text isEqualToString:@"Player One"]) {
             // Player one's turn
             tappedLabel.text = @"X";
             tappedLabel.textColor = [UIColor blueColor];
             [self updateWhichPlayerLabel:@"Player Two"];
-            NSString *winner = [self whoWon];
-            if ([winner isEqualToString:@"x"]) {
-                [self showWinnerAlert:winner];
+            [self updateLabelXOToDrag];
+            [self whoWon];
+            if (self.gameTimerSegmentedControl.selectedSegmentIndex == 1) {
+                [self stopTurnTimer];
+                [self startTurnTimer];
+            }
+            else {
+                self.gameTimerSegmentedControl.enabled = NO;
             }
         }
         else {
@@ -99,9 +140,14 @@
             tappedLabel.text = @"O";
             tappedLabel.textColor = [UIColor redColor];
             [self updateWhichPlayerLabel: @"Player One"];
-            NSString *winner = [self whoWon];
-            if ([winner isEqualToString:@"o"]) {
-                [self showWinnerAlert:winner];
+            [self updateLabelXOToDrag];
+            [self whoWon];
+            if (self.gameTimerSegmentedControl.selectedSegmentIndex == 1) {
+                [self stopTurnTimer];
+                [self startTurnTimer];
+            }
+            else {
+                self.gameTimerSegmentedControl.enabled = NO;
             }
         }
     }
@@ -111,15 +157,24 @@
     self.whichPlayerLabel.text = player;
 }
 
+- (void)updateLabelXOToDrag {
+    if ([self.whichPlayerLabel.text isEqualToString:@"Player One"]) {
+        self.labelXOToDrag.textColor = [UIColor blueColor];
+        self.labelXOToDrag.text = @"X";
+    }
+    else
+    {
+        self.labelXOToDrag.textColor = [UIColor redColor];
+        self.labelXOToDrag.text = @"O";
+    }
+}
+
 - (void)getIndexOfTappedSquare: (UILabel *)tappedLabel {
     int indexOfTappedSquare = (int)[self.labelsArray indexOfObject:tappedLabel];
-
     [self updateTicTacToeBoardArray:indexOfTappedSquare];
 }
 
 - (void)updateTicTacToeBoardArray: (int)ticTacToeSquareTapped {
-   // NSString *yo = NSStringFromClass([self.ticTacToeBoard[ticTacToeSquareTapped] class]);
-   // NSLog(@"%@", yo );
     if (ticTacToeSquareTapped < 3) {
         [self updateBoardArray:ticTacToeSquareTapped];
     }
@@ -143,7 +198,7 @@
 }
 
 - (NSString *)whoWon {
-    NSString *winner = [[NSString alloc] init];
+    NSString *winner = @"No Winner";
     NSString *playerOne = @"x";
     NSString *playerTwo = @"o";
 
@@ -153,6 +208,15 @@
     else if ([[self checkWhichPlayerWon:playerTwo playerNumberString:@"2"] isEqualToString:playerTwo]) {
         winner = playerTwo;
     }
+
+    if ([winner isEqualToString:playerOne]) {
+        [self showWinnerAlert:winner];
+    } else if ([winner isEqualToString:playerTwo])
+    {
+        [self showWinnerAlert:winner];
+    }
+
+    [self checkForTie:winner];
 
     return winner;
 }
@@ -164,10 +228,27 @@
         alertView.title = @"Player One Wins!";
     } else if ([winner isEqualToString:@"o"]) {
         alertView.title = @"Player Two Wins!";
+    } else if ([winner isEqualToString:@"Tie!"]) {
+        alertView.title = @"Tie!";
     }
-    [alertView addButtonWithTitle:@"New Game"];
 
+    [alertView addButtonWithTitle:@"New Game"];
     [alertView show];
+}
+
+- (void)checkForTie: (NSString *)winner {
+    int fullSquares = 0;
+    for (int counter = 0; counter < self.ticTacToeBoard.count; counter++)
+    {
+        if ([winner isEqualToString:@"No Winner"] && ![@"0" isEqualToString:[self.ticTacToeBoard objectAtIndex:counter]])
+        {
+            fullSquares++;
+        }
+    }
+    if (fullSquares == self.ticTacToeBoard.count) {
+        [self showWinnerAlert:@"Tie!"];
+    }
+
 }
 
 - (NSString *)checkWhichPlayerWon: (NSString *)player playerNumberString:(NSString *)playerNumberString {
@@ -220,7 +301,7 @@
         return player;
     }
     else {
-        return @"Error";
+        return @"No Winner";
     }
 }
 
@@ -242,18 +323,26 @@
 - (void)alertView: (UIAlertView *)alertView clickedButtonAtIndex: (NSInteger)buttonIndex {
     if (buttonIndex == 0){
         [self resetBoard];
+        [self stopTurnTimer];
+        [UIView animateWithDuration:1.0 animations:^{
+            self.timerLabel.alpha = 0.0;
+        }];
+        self.gameTimerSegmentedControl.selectedSegmentIndex = 0;
+        self.gameTimerSegmentedControl.enabled = YES;
     }
 }
 
 - (void)resetBoard {
-        int counter = 0;
+    int counter = 0;
 
-        for (UILabel *label in self.labelsArray) {
-            label.text = @"  ";
-            self.ticTacToeBoard[counter] = @"0";
-            [self updateWhichPlayerLabel:@"Player One"];
-            counter++;
-        }
+    for (UILabel *label in self.labelsArray) {
+        label.text = @"  ";
+        self.ticTacToeBoard[counter] = @"0";
+        counter++;
+    }
+    [self updateWhichPlayerLabel:@"Player One"];
+    self.labelXOToDrag.textColor = [UIColor blueColor];
+    self.labelXOToDrag.text = @"X";
 }
 
 - (IBAction)onDrag:(UIPanGestureRecognizer *)panGesture {
@@ -261,17 +350,108 @@
     self.labelXOToDrag.center = point;
 
     if (panGesture.state == UIGestureRecognizerStateEnded) {
+
+        for (UILabel *label in self.labelsArray) {
+            if (CGRectContainsPoint(label.frame, point) && [label.text isEqualToString:@"  "]) {
+                if ([self.whichPlayerLabel.text isEqualToString:@"Player One"]) {
+                    [self getIndexOfTappedSquare:label];
+                    [self dragLabelOnToBoardForPlayer:@"Player One" playerColor:[UIColor blueColor] playerLetter:@"X" label:label];
+                    //[self whoWon];
+                }
+                else
+                {
+                    [self getIndexOfTappedSquare:label];
+                    [self dragLabelOnToBoardForPlayer:@"Player Two" playerColor:[UIColor redColor] playerLetter:@"O" label:label];
+                    //[self whoWon];
+                }
+            }
+            else {
+                [UIView animateWithDuration:0.5 animations:^{
+                    self.labelXOToDrag.center = self.originalCenterPointForDraggableXOLabel;
+                }];
+            }
+        }
+        [self whoWon];
+    }
+}
+
+
+- (void)dragLabelOnToBoardForPlayer: (NSString *)player
+                        playerColor:(UIColor *)playercolor
+                       playerLetter:(NSString *)playerLetter
+                              label:(UILabel *)label {
+    if ([self.whichPlayerLabel.text isEqualToString:player])
+    {
+        label.text = playerLetter;
+        label.textColor = playercolor;
+        self.labelXOToDrag.alpha = 0.0;
+        self.labelXOToDrag.center = self.originalCenterPointForDraggableXOLabel;
+        // Switch the player who's turn it is
+        if ([player isEqualToString:@"Player One"]) {
+            [self updateWhichPlayerLabel:@"Player Two"];
+        } else {
+            [self updateWhichPlayerLabel:@"Player One"];
+        }
+
+        // Place the label at it's original location and switch it's text to the now current player
         [UIView animateWithDuration:1.0 animations:^{
-            self.labelXOToDrag.center = self.originalCenterPointForDraggableXOLabel;
+            if ([playerLetter isEqualToString:@"X"]) {
+                [self updateLabelXOToDrag];
+            } else {
+                [self updateLabelXOToDrag];
+            }
+            self.labelXOToDrag.alpha = 1.0;
         }];
     }
-//    else {
-//        if (CGRectContainsPoint(self.thePreCogs.frame, point)) {
-//            self.labelXOToDrag.backgroundColor = [UIColor redColor];
-//            self.labelXOToDrag.text = @"A ficticious and incriminating future";
-//            [self.labelXOToDrag sizeToFit];
-//        }
-//    }
+}
+
+- (void)startTurnTimer {
+    if (self.turnTimer) {
+        [self stopTurnTimer];
+    }
+    self.turnTimerCounter = kTurnTimerValue;
+    self.turnTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                      target:self
+                                                    selector:@selector(turnCountdown:)
+                                                    userInfo:nil
+                                                     repeats:YES];
+}
+
+- (void)stopTurnTimer {
+    if (self.turnTimer) {
+        [self.turnTimer invalidate];
+        self.turnTimer = nil;
+    }
+}
+
+- (void)resetTurnTimer {
+    [self stopTurnTimer];
+    self.timerLabel.text = [NSString stringWithFormat:@"%i", kTurnTimerValue];
+}
+
+- (void)turnCountdown: (id)sender {
+    if (self.turnTimerCounter == 0) {
+        if (self.turnTimer) {
+            [self stopTurnTimer];
+            [self forfitCurrentUsersTurn];
+            [self startTurnTimer];
+        }
+    }
+    //timerLabel
+    self.timerLabel.text = [NSString stringWithFormat:@"%i", self.turnTimerCounter];
+    self.turnTimerCounter--;
+}
+
+- (void)forfitCurrentUsersTurn {
+    if ([self.whichPlayerLabel.text isEqualToString:@"Player One"]) {
+        [self updateWhichPlayerLabel:@"Player Two"];
+        [self updateLabelXOToDrag];
+    }
+    else
+    {
+        [self updateWhichPlayerLabel:@"Player One"];
+        [self updateLabelXOToDrag];
+    }
 }
 
 - (void)didReceiveMemoryWarning {

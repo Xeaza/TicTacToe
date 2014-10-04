@@ -73,15 +73,28 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Player" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e9A-MP-Q01">
-                                <rect key="frame" x="46" y="421" width="283" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="X" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hni-bA-lNe">
+                                <rect key="frame" x="257" y="414" width="55" height="58"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="45"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="X" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hni-bA-lNe">
-                                <rect key="frame" x="143" y="480" width="89" height="89"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="45"/>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="GlY-hM-w6r">
+                                <rect key="frame" x="78" y="612" width="219" height="29"/>
+                                <segments>
+                                    <segment title="Game Timer Off"/>
+                                    <segment title="Game Timer On"/>
+                                </segments>
+                            </segmentedControl>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Player One" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e9A-MP-Q01">
+                                <rect key="frame" x="41" y="419" width="196" height="46"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="35"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="10" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="spu-6l-dCH">
+                                <rect key="frame" x="147" y="491" width="80" height="83"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Thin" family="Helvetica Neue" pointSize="70"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -95,6 +108,7 @@
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
                     <connections>
+                        <outlet property="gameTimerSegmentedControl" destination="GlY-hM-w6r" id="TFq-ZS-w7g"/>
                         <outlet property="labelEight" destination="o4N-6H-DoC" id="VpW-RH-Ifw"/>
                         <outlet property="labelFive" destination="SKw-Qd-Ney" id="h7f-yJ-fas"/>
                         <outlet property="labelFour" destination="ZeW-ah-KJ6" id="Ixn-7u-Yy2"/>
@@ -105,6 +119,7 @@
                         <outlet property="labelThree" destination="sfO-Sk-8If" id="lDU-V3-cBn"/>
                         <outlet property="labelTwo" destination="1b5-7w-xju" id="a5M-YK-u0y"/>
                         <outlet property="labelXOToDrag" destination="hni-bA-lNe" id="ual-wL-XMW"/>
+                        <outlet property="timerLabel" destination="spu-6l-dCH" id="eRo-Rh-9yC"/>
                         <outlet property="whichPlayerLabel" destination="e9A-MP-Q01" id="1KM-xh-MhG"/>
                     </connections>
                 </viewController>
