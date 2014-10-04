@@ -7,6 +7,7 @@
 //
 #import "ViewController.h"
 #import "HelpWebViewController.h"
+#import "TicTacToeBoard.h"
 
 const int kTurnTimerValue = 10;
 
@@ -76,6 +77,8 @@ const int kTurnTimerValue = 10;
                                        action:@selector(gameTimerSegmentedControlChanged:)
                              forControlEvents:UIControlEventValueChanged];
     self.timerLabel.alpha = 0.0;
+
+    TicTacToeBoard *ticTacToeBoard = [[TicTacToeBoard alloc] initWithLabels:self.labelsArray];
 }
 
 - (void)gameTimerSegmentedControlChanged: (id)sender {
@@ -460,10 +463,5 @@ const int kTurnTimerValue = 10;
     UIStoryboardSegue *helpSeque = [[UIStoryboardSegue alloc] initWithIdentifier:@"helpSeque" source:self destination:helpWebViewController];
     [self prepareForSegue:helpSeque sender:self];
 }
-
-//- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-//    [self]
-//}
-
 
 @end
