@@ -43,6 +43,15 @@ const int kTurnTimerValue = 10;
 
 @property BOOL areYouPlayingAComputer;
 
+@property NSArray *topRow;
+@property NSArray *middleRow;
+@property NSArray *bottomRow;
+@property NSArray *diagLeftRow;
+@property NSArray *diagRightRow;
+@property NSArray *leftRow;
+@property NSArray *middleVertRow;
+@property NSArray *rightRow;
+
 @end
 
 @implementation ViewController
@@ -50,24 +59,27 @@ const int kTurnTimerValue = 10;
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    [self resetBoard];
-    self.areYouPlayingAComputer = YES;
+    self.topRow = @[@0,@1,@2];
+    self.middleRow = @[@3,@4,@5];
+    self.bottomRow = @[@6,@7,@8];
+    self.diagLeftRow = @[@0,@4,@8];
+    self.diagRightRow = @[@2,@4,@6];
+    self.leftRow = @[@0,@3,@6];
+    self.middleVertRow = @[@1,@4,@7];
+    self.rightRow = @[@2,@5,@8];
 
+    [self resetBoard];
+
+    self.areYouPlayingAComputer = YES;
     self.playerScore = 5;
     self.computerScore = 11;
-
     self.originalCenterPointForDraggableXOLabel = self.labelXOToDrag.center;
-
     self.isTurnTimedGame = NO;
-
     self.turnTimerCounter = kTurnTimerValue;
 
     [self.gameTimerSegmentedControl addTarget:self
                                        action:@selector(gameTimerSegmentedControlChanged:)
                              forControlEvents:UIControlEventValueChanged];
-
-
-    //TicTacToeBoard *ticTacToeBoard = [[TicTacToeBoard alloc] initWithLabels:self.labelsArray];
 }
 
 - (void)resetBoard {
@@ -85,13 +97,13 @@ const int kTurnTimerValue = 10;
     self.labelsArray = [[NSArray alloc] init];
     self.labelsArray = @[self.labelOne, self.labelTwo, self.labelThree, self.labelFour, self.labelFive, self.labelSix, self.labelSeven, self.labelEight, self.labelNine];
 
-    int counter = 0;
+    //int counter = 0;
 
-    for (UILabel *label in self.labelsArray) {
+    /*for (UILabel *label in self.labelsArray) {
         label.text = @"";
         self.ticTacToeBoard[counter] = @"0";
         counter++;
-    }
+    } */
 
     [self updateWhichPlayerLabel:@"Player One"];
     self.labelXOToDrag.textColor = [UIColor blueColor];
@@ -104,19 +116,16 @@ const int kTurnTimerValue = 10;
     // Set player initial player
     self.whichPlayerLabel.text = @"Player One";
     self.timerLabel.text = [NSString stringWithFormat:@"%i", kTurnTimerValue];
-
-    self.hasGameBegun = NO;
-
-    self.mostRecentlyTappedSquare = 0;
     self.timerLabel.alpha = 0.0;
 
+    self.hasGameBegun = NO;
+    self.mostRecentlyTappedSquare = 0;
     self.indexOfSquareToMove = 0;
 }
 
 - (void)gameTimerSegmentedControlChanged: (id)sender {
     if (self.gameTimerSegmentedControl.selectedSegmentIndex == 0) {
         //Turn off Timer
-
     }
     else
     {
@@ -136,7 +145,8 @@ const int kTurnTimerValue = 10;
         if (CGRectContainsPoint(label.frame, point))
         {
             tappedLabel = label;
-            if (!self.hasGameBegun) {
+            if (!self.hasGameBegun)
+            {
                 self.hasGameBegun = YES;
             }
         }
@@ -144,21 +154,26 @@ const int kTurnTimerValue = 10;
     return tappedLabel;
 }
 
-- (IBAction)onLabelTapped:(UITapGestureRecognizer *)tapGesture {
+- (IBAction)onLabelTapped:(UITapGestureRecognizer *)tapGesture
+{
     CGPoint point = [tapGesture locationInView:self.view];
-
     UILabel *tappedLabel = [self findLabelUsingPoint:point];
+
     [self updateTappedLabel:tappedLabel];
-    NSLog(@"%ld", (long)self.indexOfSquareToMove);
+    //NSLog(@"%ld", (long)self.indexOfSquareToMove);
     //[self makeComputersMove];
 }
 
-- (void)updateTappedLabel: (UILabel *)tappedLabel {
-
-    if ([tappedLabel.text isEqualToString:@""]) {
-        [self getIndexOfTappedSquare:tappedLabel];
-        //[self startTurnTimer];
-        if ([self.whichPlayerLabel.text isEqualToString:@"Player One"]) {
+- (void)updateTappedLabel: (UILabel *)tappedLabel
+{
+    // The user tapped on an empty tic tac toe square
+    if ([tappedLabel.text isEqualToString:@""])
+    {
+        // Update the tictactoeBoard Array to have a 1 or 2 instead of a 0 at index user tapped
+        [self updateTicTacToeBoardArray:tappedLabel];
+        // If it's player one or the human player's turn...
+        if ([self.whichPlayerLabel.text isEqualToString:@"Player One"])
+        {
             // Player one's turn
             tappedLabel.text = @"X";
             tappedLabel.textColor = [UIColor blueColor];
@@ -216,12 +231,20 @@ const int kTurnTimerValue = 10;
     }
 }
 
-- (void)getIndexOfTappedSquare: (UILabel *)tappedLabel {
+- (void)updateTicTacToeBoardArray: (UILabel *)tappedLabel {
     int indexOfTappedSquare = (int)[self.labelsArray indexOfObject:tappedLabel];
-    [self updateTicTacToeBoardArray:indexOfTappedSquare];
+    // Change the index of where the user moved to a 1 or 2 respectively
+    if ([self.ticTacToeBoard[indexOfTappedSquare] isEqualToString:@"0"]) {
+        if ([self.whichPlayerLabel.text isEqualToString:@"Player One"]) {
+            self.ticTacToeBoard[indexOfTappedSquare] = @"1";
+        }
+        else {
+            self.ticTacToeBoard[indexOfTappedSquare] = @"2";
+        }
+    }
 }
 
-- (void)updateTicTacToeBoardArray: (int)ticTacToeSquareTapped {
+/*- (void)updateTicTacToeBoardArray: (int)ticTacToeSquareTapped {
     if (ticTacToeSquareTapped < 3) {
         [self updateBoardArray:ticTacToeSquareTapped];
     }
@@ -231,18 +254,21 @@ const int kTurnTimerValue = 10;
     else if (ticTacToeSquareTapped > 5 && ticTacToeSquareTapped < 9) {
         [self updateBoardArray:ticTacToeSquareTapped];
     }
-}
+    [self updateBoardArray:ticTacToeSquareTapped];
+}*/
 
-- (void)updateBoardArray: (int)ticTacToeSquareTapped {
-    if ([self.ticTacToeBoard[ticTacToeSquareTapped] isEqualToString:@"0"]) {
-        if ([self.whichPlayerLabel.text isEqualToString:@"Player One"]) {
-            self.ticTacToeBoard[ticTacToeSquareTapped] = @"1";
-        }
-        else {
-            self.ticTacToeBoard[ticTacToeSquareTapped] = @"2";
-        }
-    }
-}
+//- (void)updateBoardArray: (int)ticTacToeSquareTapped {
+//    // Updates the tic tac toe board array with a 1 or 2 in the index of where the board was tapped
+//    // with a 1 or 2 depending on which player just made a move
+//    if ([self.ticTacToeBoard[ticTacToeSquareTapped] isEqualToString:@"0"]) {
+//        if ([self.whichPlayerLabel.text isEqualToString:@"Player One"]) {
+//            self.ticTacToeBoard[ticTacToeSquareTapped] = @"1";
+//        }
+//        else {
+//            self.ticTacToeBoard[ticTacToeSquareTapped] = @"2";
+//        }
+//    }
+//}
 
 - (IBAction)printBoardArray:(id)sender {
 //    for (NSString *boardSquare in self.ticTacToeBoard) {              <------------- HERE I AM!!! **********************************
@@ -264,13 +290,125 @@ const int kTurnTimerValue = 10;
     }
 }
 
-- (void)makeComputersMove {
-    //(long)self.indexOfSquareToMove
+/*- (void)makeComputersMove
+{
     NSArray *boardScore = [self getBoardScore];
     [self calculateComputersMove:boardScore];
 
     UILabel *computersMoveLabel = [self.labelsArray objectAtIndex:self.indexOfSquareToMove];
     [self updateTappedLabel:computersMoveLabel];
+} */
+
+- (void)makeComputersMove
+{ // TODO - Test all rows to make sure it will get you a good move for all.
+    // Getting object on board at [0][0]
+    NSInteger valueAtTopLeft = [[NSString stringWithString:[self.ticTacToeBoard objectAtIndex:[self.middleRow[0] integerValue]]] integerValue];
+    // Getting object on board at [0][1]
+    NSInteger valueAtMiddleTop = [[NSString stringWithString:[self.ticTacToeBoard objectAtIndex:[self.middleRow[1] integerValue]]] integerValue];
+    // Getting object on board at [0][2]
+    NSInteger valueAtTopRight = [[NSString stringWithString:[self.ticTacToeBoard objectAtIndex:[self.middleRow[2] integerValue]]] integerValue];
+    NSLog(@"%ld, %ld, %ld", (long)valueAtTopLeft, (long)valueAtMiddleTop, (long)valueAtTopRight);
+
+    // attacking code
+    if (valueAtTopLeft != 1 && valueAtTopLeft != 2 && valueAtMiddleTop == 2 && valueAtTopRight == 2) {
+        // Win to the left
+        //self.indexOfSquareToMove = 0;
+        NSLog(@"Win left");
+    } else if (valueAtTopLeft == 2 && valueAtMiddleTop != 1 && valueAtMiddleTop != 2 && valueAtTopRight == 2) {
+        // Win to the middle
+        //self.indexOfSquareToMove = 1;
+        NSLog(@"Win middle");
+    } else if (valueAtTopLeft == 2 && valueAtMiddleTop == 2 && valueAtTopRight != 2 && valueAtTopRight != 1) {
+        // Win to the right
+        //self.indexOfSquareToMove = 2;
+        NSLog(@"Win right");
+    } else
+    {
+        // Blocking Code
+        if (valueAtTopLeft != 2 && valueAtTopLeft != 1 && valueAtMiddleTop == 1 && valueAtTopRight == 1) {
+            // Block to the left
+            //self.indexOfSquareToMove = 0;
+            NSLog(@"Block left");
+        } else if (valueAtTopLeft == 1 && valueAtMiddleTop != 1 && valueAtMiddleTop != 2 && valueAtTopRight == 1) {
+            // Block to the middle
+           // self.indexOfSquareToMove = 1;
+            NSLog(@"Block middle");
+        } else if (valueAtTopLeft == 1 && valueAtMiddleTop == 1 && valueAtTopRight != 2 && valueAtTopRight != 1) {
+            // Block to the right
+            //self.indexOfSquareToMove = 2;
+            NSLog(@"Block right");
+        }
+        else { // Otherwise make random valid move
+            //self.indexOfSquareToMove = [[self getRandomValidIndexToMove] integerValue];
+        }
+
+    }
+
+
+//    }
+    NSInteger topRowScore = valueAtTopLeft + valueAtMiddleTop + valueAtTopRight;
+    //NSLog(@"%ld", (long)topRowScore);
+    /*
+    for (int squareIndex = 0; squareIndex < self.ticTacToeBoard.count; squareIndex++) {
+        // Only check to see if a square is a good move if nothing is there.
+       // NSLog(@"%@", [self.ticTacToeBoard objectAtIndex:squareIndex]);
+        NSInteger indexToMove = 0;
+        if ([[self.ticTacToeBoard objectAtIndex:squareIndex] isEqualToString:@""]) {
+            switch (squareIndex) {
+                case 0:
+                    indexToMove = [self checkTopLeftDiagonalLeftRows];
+                    NSInteger boardValue = (NSInteger)[self.ticTacToeBoard[[self.topRow[0] integerValue]]]; //+ [self.topRow[1] integerValue] + [self.topRow[2] integerValue];
+                    break;
+                case 1:
+                    //
+                    break;
+                case 2:
+                    //
+                    break;
+                case 3:
+                    //
+                    break;
+                case 4:
+                    //
+                    break;
+                case 5:
+                    //
+                    break;
+                case 6:
+                    //
+                    break;
+                case 7:
+                    //
+                    break;
+                case 8:
+                    //
+                    break;
+                default:
+                    NSLog(@"Out of bounds error");
+                    break;
+            } // -- End of switch statement
+        } // -- End of if square is not 0
+    } // -- End of for loop
+     */
+}
+
+- (NSNumber *)getRandomValidIndexToMove {
+    int sizeOfEmptySquareIndexesCounter = 0;
+    int indexCounter = 0;
+    NSMutableArray *emptySquareIndexes = [[NSMutableArray alloc] init];
+
+    for (NSNumber *boardSquareValue in self.ticTacToeBoard) {
+
+        if ([boardSquareValue integerValue] == 0) {
+            sizeOfEmptySquareIndexesCounter++;
+            NSNumber *emptyBoardIndex = [NSNumber numberWithInt:indexCounter];
+            [emptySquareIndexes addObject:emptyBoardIndex];
+        }
+        indexCounter++;
+    }
+    NSInteger randomIndex = arc4random() % sizeOfEmptySquareIndexesCounter;
+    NSNumber *randomValidIndexToMove = [emptySquareIndexes objectAtIndex:randomIndex];
+    return randomValidIndexToMove;
 }
 
 - (void)calculateComputersMove: (NSArray *)boardScore {
@@ -664,10 +802,10 @@ const int kTurnTimerValue = 10;
 }
 
 - (NSInteger)calculateRowScore: (NSArray *)boardScore
-                     rowSquareOne:(int)rowSquareOne
-                     rowSquareTwo:(int)rowSquareTwo
-                   rowSquareThree:(int)rowSquareThree {
-    // 0, 1, 2
+                  rowSquareOne: (int)rowSquareOne
+                  rowSquareTwo: (int)rowSquareTwo
+                rowSquareThree: (int)rowSquareThree
+{
     NSInteger firstSquareScore = [[boardScore objectAtIndex:rowSquareOne] integerValue];
     NSInteger secondSquareScore = [[boardScore objectAtIndex:rowSquareTwo] integerValue];
     NSInteger thirdSquareScore = [[boardScore objectAtIndex:rowSquareThree] integerValue];
@@ -682,22 +820,27 @@ const int kTurnTimerValue = 10;
     NSString *playerOne = @"X";
     NSString *playerTwo = @"O";
 
-    if ([[self checkWhichPlayerWon:playerOne playerNumberString:@"1"] isEqualToString:playerOne]) {
+    if ([[self checkWhichPlayerWon:playerOne playerNumberString:@"1"] isEqualToString:playerOne])
+    {
         winner = playerOne;
     }
-    else if ([[self checkWhichPlayerWon:playerTwo playerNumberString:@"2"] isEqualToString:playerTwo]) {
+    else if ([[self checkWhichPlayerWon:playerTwo playerNumberString:@"2"] isEqualToString:playerTwo])
+    {
         winner = playerTwo;
     }
 
-    if ([winner isEqualToString:playerOne]) {
+    if ([winner isEqualToString:playerOne])
+    {
         self.hasGameBegun = NO;
         [self showWinnerAlert:winner];
     }
-    else if ([winner isEqualToString:playerTwo]) {
+    else if ([winner isEqualToString:playerTwo])
+    {
         self.hasGameBegun = NO;
         [self showWinnerAlert:winner];
     }
 
+    // winner will be equal to Tie! if there is a Tie.
     [self checkForTie:winner];
 
     return winner;
@@ -722,6 +865,7 @@ const int kTurnTimerValue = 10;
     int fullSquares = 0;
     for (int counter = 0; counter < self.ticTacToeBoard.count; counter++)
     {
+        // Check if there is no winner and that board is full
         if ([winner isEqualToString:@"No Winner"] && ![@"0" isEqualToString:[self.ticTacToeBoard objectAtIndex:counter]])
         {
             fullSquares++;
@@ -735,70 +879,49 @@ const int kTurnTimerValue = 10;
 
 - (NSString *)checkWhichPlayerWon: (NSString *)player playerNumberString:(NSString *)playerNumberString {
     // Check for win accross middle win
-    if ([[self checkBoardForValidWin:player
-                        playerNumber:playerNumberString
-                            leftSpot:0 middleSpot:1 rightSpot:2] isEqualToString:player]) {
+    if ([[self checkBoardForValidWin:player playerNumber:playerNumberString rowToCheck:self.topRow] isEqualToString:player]) {
         return player;
-    }
-    // Check for win accross middle win
-    else if ([[self checkBoardForValidWin:player
-                             playerNumber:playerNumberString
-                                 leftSpot:3 middleSpot:4 rightSpot:5] isEqualToString:player]) {
+    } // Check for win accross middle win
+    else if ([[self checkBoardForValidWin:player playerNumber:playerNumberString rowToCheck:self.middleVertRow] isEqualToString:player]) {
         return player;
-    }
-    // Check for win accross bottom win
-    else if ([[self checkBoardForValidWin:player
-                             playerNumber:playerNumberString
-                                 leftSpot:6 middleSpot:7 rightSpot:8] isEqualToString:player]) {
+    } // Check for win accross bottom win
+    else if ([[self checkBoardForValidWin:player playerNumber:playerNumberString rowToCheck:self.bottomRow] isEqualToString:player]) {
         return player;
-    }
-    // Check for win straight down left
-    else if ([[self checkBoardForValidWin:player
-                             playerNumber:playerNumberString
-                                 leftSpot:0 middleSpot:3 rightSpot:6] isEqualToString:player]) {
+    } // Check for win straight down left
+    else if ([[self checkBoardForValidWin:player playerNumber:playerNumberString rowToCheck:self.leftRow] isEqualToString:player]) {
         return player;
-    }
-    // Check for win straight down middle
-    else if ([[self checkBoardForValidWin:player
-                             playerNumber:playerNumberString
-                                 leftSpot:1 middleSpot:4 rightSpot:7] isEqualToString:player]) {
+    } // Check for win straight down middle
+    else if ([[self checkBoardForValidWin:player playerNumber:playerNumberString rowToCheck:self.middleVertRow] isEqualToString:player]) {
         return player;
-    }
-    // Check for win straight down right
-    else if ([[self checkBoardForValidWin:player
-                             playerNumber:playerNumberString
-                                 leftSpot:2 middleSpot:5 rightSpot:8] isEqualToString:player]) {
+    } // Check for win straight down right
+    else if ([[self checkBoardForValidWin:player playerNumber:playerNumberString rowToCheck:self.rightRow] isEqualToString:player]) {
         return player;
-    }
-    // Check for win diagonal starting a top left
-    else if ([[self checkBoardForValidWin:player
-                             playerNumber:playerNumberString
-                                 leftSpot:0 middleSpot:4 rightSpot:8] isEqualToString:player]) {
+    } // Check for win diagonal starting a top left
+    else if ([[self checkBoardForValidWin:player playerNumber:playerNumberString rowToCheck:self.diagLeftRow] isEqualToString:player]) {
         return player;
-    }
-    // Check for win diagonal starting a top right
-    else if ([[self checkBoardForValidWin:player
-                             playerNumber:playerNumberString
-                                 leftSpot:2 middleSpot:4 rightSpot:6] isEqualToString:player]) {
+    } // Check for win diagonal starting a top right
+    else if ([[self checkBoardForValidWin:player playerNumber:playerNumberString rowToCheck:self.diagRightRow] isEqualToString:player]) {
         return player;
-    }
-    else {
-
+    } else {
         return @"No Winner";
     }
 }
 
 - (NSString *)checkBoardForValidWin: (NSString *)playerToCheck
                        playerNumber: (NSString *)playersNumberString
-                           leftSpot: (int)leftSpot
-                         middleSpot: (int)middleSpot
-                          rightSpot: (int)rightSpot {
+                         rowToCheck: (NSArray *)rowToCheck{
 
-    if ([self.ticTacToeBoard[leftSpot] isEqualToString:playersNumberString] &&
-        [self.ticTacToeBoard[middleSpot] isEqualToString:playersNumberString] &&
-        [self.ticTacToeBoard[rightSpot] isEqualToString:playersNumberString]) {
+    NSInteger checkOne = [rowToCheck[0] integerValue];
+    NSInteger checkTwo = [rowToCheck[1] integerValue];
+    NSInteger checkThree = [rowToCheck[2] integerValue];
+    if ([self.ticTacToeBoard[checkOne] isEqualToString:playersNumberString] &&
+        [self.ticTacToeBoard[checkTwo] isEqualToString:playersNumberString] &&
+        [self.ticTacToeBoard[checkThree] isEqualToString:playersNumberString])
+    {
         return playerToCheck;
-    } else {
+    }
+    else
+    {
         return playerToCheck = @"";
     }
 }
@@ -832,13 +955,13 @@ const int kTurnTimerValue = 10;
         for (UILabel *label in self.labelsArray) {
             if (CGRectContainsPoint(label.frame, point) && [label.text isEqualToString:@""]) {
                 if ([self.whichPlayerLabel.text isEqualToString:@"Player One"]) {
-                    [self getIndexOfTappedSquare:label];
+                    [self updateTicTacToeBoardArray:label];
                     [self dragLabelOnToBoardForPlayer:@"Player One" playerColor:[UIColor blueColor] playerLetter:@"X" label:label];
                     //[self whoWon];
                 }
                 else
                 {
-                    [self getIndexOfTappedSquare:label];
+                    [self updateTicTacToeBoardArray:label];
                     [self dragLabelOnToBoardForPlayer:@"Player Two" playerColor:[UIColor redColor] playerLetter:@"O" label:label];
                     //[self whoWon];
                 }

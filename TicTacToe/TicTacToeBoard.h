@@ -2,19 +2,17 @@
 //  TicTacToeBoard.h
 //  TicTacToe
 //
-//  Created by Taylor Wright-Sanson on 10/3/14.
+//  Created by Taylor Wright-Sanson on 10/5/14.
 //  Copyright (c) 2014 Taylor Wright-Sanson. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface TicTacToeBoard : NSObject
 
-@property (strong, nonatomic) NSArray *board;
-@property (strong, nonatomic) NSArray *boardLabelsArray;
-
-
--(id)initWithLabels:(NSArray *)labelsArray;
+- (id)initWithLabelsArray: (NSArray *)labelsAray;
+- (void)updateBoardWithMove: (NSInteger)indexOfMove;
 
 
 @end
