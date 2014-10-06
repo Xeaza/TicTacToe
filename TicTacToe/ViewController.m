@@ -51,6 +51,10 @@ const int kTurnTimerValue = 10;
 @property NSArray *leftRow;
 @property NSArray *middleVertRow;
 @property NSArray *rightRow;
+@property NSArray *arrayOfRows;
+
+@property BOOL validMoveNotFound;
+@property BOOL hasComputerMadeFirstMove;
 
 @end
 
@@ -67,6 +71,8 @@ const int kTurnTimerValue = 10;
     self.leftRow = @[@0,@3,@6];
     self.middleVertRow = @[@1,@4,@7];
     self.rightRow = @[@2,@5,@8];
+
+    self.arrayOfRows = @[self.topRow, self.middleRow, self.bottomRow, self.diagLeftRow, self.diagRightRow, self.leftRow, self.middleVertRow, self.rightRow];
 
     [self resetBoard];
 
@@ -96,6 +102,9 @@ const int kTurnTimerValue = 10;
     self.labelsArray = nil;
     self.labelsArray = [[NSArray alloc] init];
     self.labelsArray = @[self.labelOne, self.labelTwo, self.labelThree, self.labelFour, self.labelFive, self.labelSix, self.labelSeven, self.labelEight, self.labelNine];
+
+    self.validMoveNotFound = YES;
+    self.hasComputerMadeFirstMove = NO;
 
     //int counter = 0;
 
@@ -180,9 +189,16 @@ const int kTurnTimerValue = 10;
             [self updateWhichPlayerLabel:@"Player Two"];
             [self updateLabelXOToDrag];
             [self whoWon];
-            if (self.hasGameBegun) {
-                [self makeComputersMove];
+
+            //if (self.hasGameBegun && self.hasComputerMadeFirstMove == NO) {
+            if (self.hasComputerMadeFirstMove == NO) {
+                int counter = 0;
+                while (self.validMoveNotFound && counter < 9) {
+                    [self makeComputersMove:self.arrayOfRows[counter]];
+                    counter++;
+                }
             }
+
             if (self.gameTimerSegmentedControl.selectedSegmentIndex == 1) {
                 [self stopTurnTimer];
                 [self startTurnTimer];
@@ -198,6 +214,15 @@ const int kTurnTimerValue = 10;
             [self updateWhichPlayerLabel: @"Player One"];
             [self updateLabelXOToDrag];
             [self whoWon];
+
+           /* if (self.hasGameBegun) {
+                int counter = 0;
+                while (self.validMoveNotFound && counter < 9) {
+                    [self makeComputersMove:self.arrayOfRows[counter]];
+                    counter++;
+                }
+            } */
+            self.validMoveNotFound = YES;
             if (self.gameTimerSegmentedControl.selectedSegmentIndex == 1) {
                 [self stopTurnTimer];
                 [self startTurnTimer];
@@ -299,97 +324,61 @@ const int kTurnTimerValue = 10;
     [self updateTappedLabel:computersMoveLabel];
 } */
 
-- (void)makeComputersMove
+- (void)makeComputersMove: (NSArray *)rowToTest
 { // TODO - Test all rows to make sure it will get you a good move for all.
     // Getting object on board at [0][0]
-    NSInteger valueAtTopLeft = [[NSString stringWithString:[self.ticTacToeBoard objectAtIndex:[self.middleRow[0] integerValue]]] integerValue];
+    NSInteger valueAtTopLeft = [[NSString stringWithString:[self.ticTacToeBoard objectAtIndex:[rowToTest[0] integerValue]]] integerValue];
     // Getting object on board at [0][1]
-    NSInteger valueAtMiddleTop = [[NSString stringWithString:[self.ticTacToeBoard objectAtIndex:[self.middleRow[1] integerValue]]] integerValue];
+    NSInteger valueAtMiddleTop = [[NSString stringWithString:[self.ticTacToeBoard objectAtIndex:[rowToTest[1] integerValue]]] integerValue];
     // Getting object on board at [0][2]
-    NSInteger valueAtTopRight = [[NSString stringWithString:[self.ticTacToeBoard objectAtIndex:[self.middleRow[2] integerValue]]] integerValue];
+    NSInteger valueAtTopRight = [[NSString stringWithString:[self.ticTacToeBoard objectAtIndex:[rowToTest[2] integerValue]]] integerValue];
     NSLog(@"%ld, %ld, %ld", (long)valueAtTopLeft, (long)valueAtMiddleTop, (long)valueAtTopRight);
 
     // attacking code
     if (valueAtTopLeft != 1 && valueAtTopLeft != 2 && valueAtMiddleTop == 2 && valueAtTopRight == 2) {
         // Win to the left
-        //self.indexOfSquareToMove = 0;
+        self.indexOfSquareToMove = [rowToTest[0] integerValue];
+        self.validMoveNotFound = NO;
         NSLog(@"Win left");
     } else if (valueAtTopLeft == 2 && valueAtMiddleTop != 1 && valueAtMiddleTop != 2 && valueAtTopRight == 2) {
         // Win to the middle
-        //self.indexOfSquareToMove = 1;
+        self.indexOfSquareToMove = [rowToTest[1] integerValue];
+        self.validMoveNotFound = NO;
         NSLog(@"Win middle");
     } else if (valueAtTopLeft == 2 && valueAtMiddleTop == 2 && valueAtTopRight != 2 && valueAtTopRight != 1) {
         // Win to the right
-        //self.indexOfSquareToMove = 2;
+        self.indexOfSquareToMove = [rowToTest[2] integerValue];
+        self.validMoveNotFound = NO;
         NSLog(@"Win right");
     } else
     {
         // Blocking Code
         if (valueAtTopLeft != 2 && valueAtTopLeft != 1 && valueAtMiddleTop == 1 && valueAtTopRight == 1) {
             // Block to the left
-            //self.indexOfSquareToMove = 0;
+            self.indexOfSquareToMove = [rowToTest[0] integerValue];
+            self.validMoveNotFound = NO;
             NSLog(@"Block left");
         } else if (valueAtTopLeft == 1 && valueAtMiddleTop != 1 && valueAtMiddleTop != 2 && valueAtTopRight == 1) {
             // Block to the middle
-           // self.indexOfSquareToMove = 1;
+            self.indexOfSquareToMove = [rowToTest[1] integerValue];
+            self.validMoveNotFound = NO;
             NSLog(@"Block middle");
         } else if (valueAtTopLeft == 1 && valueAtMiddleTop == 1 && valueAtTopRight != 2 && valueAtTopRight != 1) {
             // Block to the right
-            //self.indexOfSquareToMove = 2;
+            self.indexOfSquareToMove = [rowToTest[2] integerValue];
+            self.validMoveNotFound = NO;
             NSLog(@"Block right");
         }
         else { // Otherwise make random valid move
-            //self.indexOfSquareToMove = [[self getRandomValidIndexToMove] integerValue];
+            self.indexOfSquareToMove = [[self getRandomValidIndexToMove] integerValue];
+            self.validMoveNotFound = NO;
         }
 
     }
 
-
-//    }
-    NSInteger topRowScore = valueAtTopLeft + valueAtMiddleTop + valueAtTopRight;
-    //NSLog(@"%ld", (long)topRowScore);
-    /*
-    for (int squareIndex = 0; squareIndex < self.ticTacToeBoard.count; squareIndex++) {
-        // Only check to see if a square is a good move if nothing is there.
-       // NSLog(@"%@", [self.ticTacToeBoard objectAtIndex:squareIndex]);
-        NSInteger indexToMove = 0;
-        if ([[self.ticTacToeBoard objectAtIndex:squareIndex] isEqualToString:@""]) {
-            switch (squareIndex) {
-                case 0:
-                    indexToMove = [self checkTopLeftDiagonalLeftRows];
-                    NSInteger boardValue = (NSInteger)[self.ticTacToeBoard[[self.topRow[0] integerValue]]]; //+ [self.topRow[1] integerValue] + [self.topRow[2] integerValue];
-                    break;
-                case 1:
-                    //
-                    break;
-                case 2:
-                    //
-                    break;
-                case 3:
-                    //
-                    break;
-                case 4:
-                    //
-                    break;
-                case 5:
-                    //
-                    break;
-                case 6:
-                    //
-                    break;
-                case 7:
-                    //
-                    break;
-                case 8:
-                    //
-                    break;
-                default:
-                    NSLog(@"Out of bounds error");
-                    break;
-            } // -- End of switch statement
-        } // -- End of if square is not 0
-    } // -- End of for loop
-     */
+    UILabel *computersMoveLabel = [self.labelsArray objectAtIndex:self.indexOfSquareToMove];
+    [self updateTappedLabel:computersMoveLabel];
+    self.hasComputerMadeFirstMove = YES;
 }
 
 - (NSNumber *)getRandomValidIndexToMove {
