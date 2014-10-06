@@ -37,38 +37,27 @@ const int kTurnTimerValue = 10;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *gameTimerSegmentedControl;
 @property (weak, nonatomic) IBOutlet UILabel *timerLabel;
 
+@property int playerScore;
+@property int computerScore;
+@property NSInteger indexOfSquareToMove;
+
+@property BOOL areYouPlayingAComputer;
+
 @end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.labelOne.text   = @"  ";
-    self.labelTwo.text   = @"  ";
-    self.labelThree.text = @"  ";
-    self.labelFour.text  = @"  ";
-    self.labelFive.text  = @"  ";
-    self.labelSix.text   = @"  ";
-    self.labelSeven.text = @"  ";
-    self.labelEight.text = @"  ";
-    self.labelNine.text  = @"  ";
+
+    [self resetBoard];
+    self.areYouPlayingAComputer = YES;
+
+    self.playerScore = 5;
+    self.computerScore = 11;
 
     self.originalCenterPointForDraggableXOLabel = self.labelXOToDrag.center;
 
-    self.labelsArray = [[NSArray alloc] init];
-    self.labelsArray = @[self.labelOne, self.labelTwo, self.labelThree, self.labelFour, self.labelFive, self.labelSix, self.labelSeven, self.labelEight, self.labelNine];
-
-    self.ticTacToeBoard = [[NSMutableArray alloc] initWithArray:@[@"0",@"0",@"0",@"0",@"0",@"0",@"0",@"0",@"0"]];
-
-    self.labelXOToDrag.textColor = [UIColor blueColor];
-
-    self.mostRecentlyTappedSquare = 0;
-
-    // Set player initial player
-    self.whichPlayerLabel.text = @"Player One";
-    self.timerLabel.text = [NSString stringWithFormat:@"%i", kTurnTimerValue];
-
-    self.hasGameBegun = NO;
     self.isTurnTimedGame = NO;
 
     self.turnTimerCounter = kTurnTimerValue;
@@ -76,9 +65,52 @@ const int kTurnTimerValue = 10;
     [self.gameTimerSegmentedControl addTarget:self
                                        action:@selector(gameTimerSegmentedControlChanged:)
                              forControlEvents:UIControlEventValueChanged];
+
+
+    //TicTacToeBoard *ticTacToeBoard = [[TicTacToeBoard alloc] initWithLabels:self.labelsArray];
+}
+
+- (void)resetBoard {
+    self.labelOne.text   = @"";
+    self.labelTwo.text   = @"";
+    self.labelThree.text = @"";
+    self.labelFour.text  = @"";
+    self.labelFive.text  = @"";
+    self.labelSix.text   = @"";
+    self.labelSeven.text = @"";
+    self.labelEight.text = @"";
+    self.labelNine.text  = @"";
+
+    self.labelsArray = nil;
+    self.labelsArray = [[NSArray alloc] init];
+    self.labelsArray = @[self.labelOne, self.labelTwo, self.labelThree, self.labelFour, self.labelFive, self.labelSix, self.labelSeven, self.labelEight, self.labelNine];
+
+    int counter = 0;
+
+    for (UILabel *label in self.labelsArray) {
+        label.text = @"";
+        self.ticTacToeBoard[counter] = @"0";
+        counter++;
+    }
+
+    [self updateWhichPlayerLabel:@"Player One"];
+    self.labelXOToDrag.textColor = [UIColor blueColor];
+    self.labelXOToDrag.text = @"X";
+
+    self.ticTacToeBoard = [[NSMutableArray alloc] initWithArray:@[@"0",@"0",@"0",@"0",@"0",@"0",@"0",@"0",@"0"]];
+
+    self.labelXOToDrag.textColor = [UIColor blueColor];
+
+    // Set player initial player
+    self.whichPlayerLabel.text = @"Player One";
+    self.timerLabel.text = [NSString stringWithFormat:@"%i", kTurnTimerValue];
+
+    self.hasGameBegun = NO;
+
+    self.mostRecentlyTappedSquare = 0;
     self.timerLabel.alpha = 0.0;
 
-    TicTacToeBoard *ticTacToeBoard = [[TicTacToeBoard alloc] initWithLabels:self.labelsArray];
+    self.indexOfSquareToMove = 0;
 }
 
 - (void)gameTimerSegmentedControlChanged: (id)sender {
@@ -117,11 +149,13 @@ const int kTurnTimerValue = 10;
 
     UILabel *tappedLabel = [self findLabelUsingPoint:point];
     [self updateTappedLabel:tappedLabel];
+    NSLog(@"%ld", (long)self.indexOfSquareToMove);
+    //[self makeComputersMove];
 }
 
 - (void)updateTappedLabel: (UILabel *)tappedLabel {
 
-    if ([tappedLabel.text isEqualToString:@"  "]) {
+    if ([tappedLabel.text isEqualToString:@""]) {
         [self getIndexOfTappedSquare:tappedLabel];
         //[self startTurnTimer];
         if ([self.whichPlayerLabel.text isEqualToString:@"Player One"]) {
@@ -131,6 +165,9 @@ const int kTurnTimerValue = 10;
             [self updateWhichPlayerLabel:@"Player Two"];
             [self updateLabelXOToDrag];
             [self whoWon];
+            if (self.hasGameBegun) {
+                [self makeComputersMove];
+            }
             if (self.gameTimerSegmentedControl.selectedSegmentIndex == 1) {
                 [self stopTurnTimer];
                 [self startTurnTimer];
@@ -154,6 +191,12 @@ const int kTurnTimerValue = 10;
                 self.gameTimerSegmentedControl.enabled = NO;
             }
         }
+    }
+    else
+    {
+        /*if (self.hasGameBegun) {
+            [self makeComputersMove];
+        }*/
     }
 }
 
@@ -201,10 +244,443 @@ const int kTurnTimerValue = 10;
     }
 }
 
+- (IBAction)printBoardArray:(id)sender {
+//    for (NSString *boardSquare in self.ticTacToeBoard) {              <------------- HERE I AM!!! **********************************
+//
+//    }
+    //NSLog(@"%@", self.ticTacToeBoard);
+    //[self getValidMoves];
+    NSArray *boardScore = [self getBoardScore];
+    [self calculateComputersMove:boardScore];
+}
+
+- (void)getValidMoves {
+    NSMutableArray *indexesWhereCompCanMove = [[NSMutableArray alloc] init];
+
+    for (int a = 0; a < self.ticTacToeBoard.count; a++) {
+        if ([self.ticTacToeBoard[a] isEqualToString:@"0"]) {
+            [indexesWhereCompCanMove addObject:[NSNumber numberWithInt:a]];
+        }
+    }
+}
+
+- (void)makeComputersMove {
+    //(long)self.indexOfSquareToMove
+    NSArray *boardScore = [self getBoardScore];
+    [self calculateComputersMove:boardScore];
+
+    UILabel *computersMoveLabel = [self.labelsArray objectAtIndex:self.indexOfSquareToMove];
+    [self updateTappedLabel:computersMoveLabel];
+}
+
+- (void)calculateComputersMove: (NSArray *)boardScore {
+    // Iterate through boardScore array
+    //NSInteger indexOfSquareToMove = 0;
+   /*NSInteger maths = 0;
+    for (NSNumber *num in boardScore) {
+        maths = maths + [num integerValue];
+    }
+    NSLog(@"Maths: %li", (long)maths);*/
+
+
+    NSInteger bestMove = 0;
+    NSArray *caseOne = @[@11, @0, @0, @0, @0, @5, @0, @5, @0];
+
+    int counter = 0;
+    for (id score in boardScore) {
+        if ((int)score == (int)[caseOne objectAtIndex:counter]) {
+            counter++;
+        }
+    }
+
+    if (counter == boardScore.count) {
+        [self setRandomIndexForComputerToMove];
+    }
+    else {
+        for (int scoreIndex = 0; scoreIndex < boardScore.count; scoreIndex++) {
+            // If the current place on the tic tac toe board is empty (i.e. a valid move)
+
+            if ([[boardScore objectAtIndex:scoreIndex] integerValue] == 0) {
+                NSInteger topRowScore, middleRowScore, bottomRowScore, leftRowScore, middleVertScore,
+                rightRowScore, leftDiagonalRowScore, rightDiagonalrowScore;
+                // Calcualte the score of each row the current square extends to
+                if (bestMove != 10)
+                {
+                    switch (scoreIndex)
+                    {
+                        case 0:
+                            // Looking at top left square. Calculate scores for Top row, diagonal left, left row
+                            topRowScore          = [self calculateRowScore:boardScore rowSquareOne:0 rowSquareTwo:1 rowSquareThree:2];
+                            leftDiagonalRowScore = [self calculateRowScore:boardScore rowSquareOne:0 rowSquareTwo:4 rowSquareThree:8];
+                            leftRowScore         = [self calculateRowScore:boardScore rowSquareOne:0 rowSquareTwo:3 rowSquareThree:6];
+
+                            if (topRowScore == 10) {
+                                bestMove = topRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:topRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (leftDiagonalRowScore == 10) {
+                                bestMove = leftDiagonalRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:leftDiagonalRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (leftRowScore == 10) {
+                                bestMove = leftRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:leftRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (topRowScore == 5) {
+                                bestMove = topRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:topRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (leftDiagonalRowScore == 5) {
+                                bestMove = leftDiagonalRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:leftDiagonalRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (leftRowScore == 5) {
+                                bestMove = leftRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:leftRowScore scoreIndex:scoreIndex];
+                            }
+                            else {
+                                [self setRandomIndexForComputerToMove];
+                            }
+                            break;
+                        case 1:
+                            // Looking at top middle square. Calculate scores for Top row, middle vertical row
+                            topRowScore     = [self calculateRowScore:boardScore rowSquareOne:0 rowSquareTwo:1 rowSquareThree:2];
+                            middleVertScore = [self calculateRowScore:boardScore rowSquareOne:1 rowSquareTwo:4 rowSquareThree:7];
+
+                            if (topRowScore == 10) {
+                                bestMove = topRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:topRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (middleVertScore == 10) {
+                                bestMove = middleVertScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:middleVertScore scoreIndex:scoreIndex];
+                            }
+                            else if (topRowScore == 5) {
+                                bestMove = topRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:topRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (middleVertScore == 5)
+                            {
+                                bestMove = middleVertScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:middleVertScore scoreIndex:scoreIndex];
+                            }
+                            else {
+                                [self setRandomIndexForComputerToMove];
+                            }
+                            break;
+                        case 2:
+                            // Looking at top right square. Calculate scores for Top row, diagonal right, right row
+                            topRowScore           = [self calculateRowScore:boardScore rowSquareOne:0 rowSquareTwo:1 rowSquareThree:2];
+                            rightDiagonalrowScore = [self calculateRowScore:boardScore rowSquareOne:2 rowSquareTwo:4 rowSquareThree:6];
+                            rightRowScore         = [self calculateRowScore:boardScore rowSquareOne:2 rowSquareTwo:5 rowSquareThree:8];
+
+                            if (topRowScore == 10) {
+                                bestMove = topRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:topRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (rightDiagonalrowScore == 10) {
+                                bestMove = rightDiagonalrowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:rightDiagonalrowScore scoreIndex:scoreIndex];
+                            }
+                            else if (rightRowScore == 10) {
+                                bestMove = rightRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:rightRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (topRowScore == 5) {
+                                bestMove = topRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:topRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (rightDiagonalrowScore == 5) {
+                                bestMove = rightDiagonalrowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:rightDiagonalrowScore scoreIndex:scoreIndex];
+                            }
+                            else if (rightRowScore == 5)
+                            {
+                                bestMove = rightRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:rightRowScore scoreIndex:scoreIndex];
+                            }
+                            else {
+                                [self setRandomIndexForComputerToMove];
+                            }
+                            break;
+                        case 3:
+                            // Looking at middle left square. Calculate scores for left row, middle row
+                            leftRowScore   = [self calculateRowScore:boardScore rowSquareOne:0 rowSquareTwo:3 rowSquareThree:6];
+                            middleRowScore = [self calculateRowScore:boardScore rowSquareOne:3 rowSquareTwo:4 rowSquareThree:5];
+
+                            if (leftRowScore == 10) {
+                                bestMove = leftRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:leftRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (middleRowScore == 10) {
+                                bestMove = middleRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:middleRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (leftRowScore == 5) {
+                                bestMove = leftRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:leftRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (middleRowScore == 5)
+                            {
+                                bestMove = middleRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:middleRowScore scoreIndex:scoreIndex];
+                            }
+                            else {
+                                [self setRandomIndexForComputerToMove];
+                            }
+                            break;
+                        case 4:
+                            // Looking at middle middle square. Calculate scores for middle & middle vertical squares, diagonal left & right rows
+                            middleRowScore        = [self calculateRowScore:boardScore rowSquareOne:3 rowSquareTwo:4 rowSquareThree:5];
+                            middleVertScore       = [self calculateRowScore:boardScore rowSquareOne:1 rowSquareTwo:4 rowSquareThree:7];
+                            leftDiagonalRowScore  = [self calculateRowScore:boardScore rowSquareOne:2 rowSquareTwo:4 rowSquareThree:6];
+                            rightDiagonalrowScore = [self calculateRowScore:boardScore rowSquareOne:0 rowSquareTwo:4 rowSquareThree:8];
+
+                            if (middleRowScore == 10) {
+                                bestMove = middleRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:middleRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (middleVertScore == 10) {
+                                bestMove = middleVertScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:middleVertScore scoreIndex:scoreIndex];
+                            }
+                            else if (leftDiagonalRowScore == 10) {
+                                bestMove = leftDiagonalRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:leftDiagonalRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (rightDiagonalrowScore == 10) {
+                                bestMove = rightDiagonalrowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:rightDiagonalrowScore scoreIndex:scoreIndex];
+                            }
+                            else if (middleRowScore == 5) {
+                                bestMove = middleRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:middleRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (middleVertScore == 5) {
+                                bestMove = middleVertScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:middleVertScore scoreIndex:scoreIndex];
+                            }
+                            else if (leftDiagonalRowScore == 5) {
+                                bestMove = leftDiagonalRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:leftDiagonalRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (rightDiagonalrowScore == 5) {
+                                bestMove = rightDiagonalrowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:rightDiagonalrowScore scoreIndex:scoreIndex];
+                            }
+                            else {
+                                [self setRandomIndexForComputerToMove];
+                            }
+                            break;
+                        case 5:
+                            // Looking at middle right square. Calculate scores for middle row, right row
+                            middleRowScore = [self calculateRowScore:boardScore rowSquareOne:3 rowSquareTwo:4 rowSquareThree:5];
+                            rightRowScore  = [self calculateRowScore:boardScore rowSquareOne:2 rowSquareTwo:5 rowSquareThree:8];
+
+                            if (middleRowScore == 10) {
+                                bestMove = middleRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:middleRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (rightRowScore == 10) {
+                                bestMove = rightRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:rightRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (middleRowScore == 5) {
+                                bestMove = middleRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:middleRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (rightRowScore == 5) {
+                                bestMove = rightRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:rightRowScore scoreIndex:scoreIndex];
+                            }
+                            else {
+                                [self setRandomIndexForComputerToMove];
+                            }
+                            break;
+                        case 6:
+                            // Looking at bottom left square. Calculate scores for left row, bottom row, diagonal right row
+                            leftRowScore          = [self calculateRowScore:boardScore rowSquareOne:0 rowSquareTwo:3 rowSquareThree:6];
+                            bottomRowScore        = [self calculateRowScore:boardScore rowSquareOne:6 rowSquareTwo:7 rowSquareThree:8];
+                            rightDiagonalrowScore = [self calculateRowScore:boardScore rowSquareOne:2 rowSquareTwo:4 rowSquareThree:6];
+
+                            if (leftRowScore == 10) {
+                                bestMove = leftRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:leftRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (bottomRowScore == 10) {
+                                bestMove = bottomRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:bottomRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (rightDiagonalrowScore == 10) {
+                                bestMove = rightDiagonalrowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:rightDiagonalrowScore scoreIndex:scoreIndex];
+                            }
+                            else if (leftRowScore == 5) {
+                                bestMove = leftRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:leftRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (bottomRowScore == 5) {
+                                bestMove = bottomRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:bottomRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (rightDiagonalrowScore == 5) {
+                                bestMove = rightDiagonalrowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:rightDiagonalrowScore scoreIndex:scoreIndex];
+                            }
+                            else {
+                                [self setRandomIndexForComputerToMove];
+                            }
+                            break;
+                        case 7:
+                            // Looking at bottom middle square. Calculate scores for bottom row, middle vert row
+                            bottomRowScore  = [self calculateRowScore:boardScore rowSquareOne:6 rowSquareTwo:7 rowSquareThree:8];
+                            middleVertScore = [self calculateRowScore:boardScore rowSquareOne:1 rowSquareTwo:4 rowSquareThree:7];
+
+                            if (bottomRowScore == 10) {
+                                bestMove = bottomRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:bottomRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (middleVertScore == 10) {
+                                bestMove = middleVertScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:middleVertScore scoreIndex:scoreIndex];
+                            }
+                            else if (bottomRowScore == 5) {
+                                bestMove = bottomRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:bottomRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (middleVertScore == 5) {
+                                bestMove = middleVertScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:middleVertScore scoreIndex:scoreIndex];
+                            }
+                            else {
+                                [self setRandomIndexForComputerToMove];
+                            }
+                            break;
+                        case 8:
+                            // Looking at bottom right square. Calculate scores for bottom row, diagonal left row, right row
+                            bottomRowScore       = [self calculateRowScore:boardScore rowSquareOne:6 rowSquareTwo:7 rowSquareThree:8];
+                            leftDiagonalRowScore = [self calculateRowScore:boardScore rowSquareOne:0 rowSquareTwo:4 rowSquareThree:8];
+                            rightRowScore        = [self calculateRowScore:boardScore rowSquareOne:2 rowSquareTwo:5 rowSquareThree:8];
+
+                            if (bottomRowScore == 10) {
+                                bestMove = bottomRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:bottomRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (leftDiagonalRowScore == 10) {
+                                bestMove = leftDiagonalRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:leftDiagonalRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (rightRowScore == 10) {
+                                bestMove = rightRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:rightRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (bottomRowScore == 5) {
+                                bestMove = bottomRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:bottomRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (leftDiagonalRowScore == 5) {
+                                bestMove = leftDiagonalRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:leftDiagonalRowScore scoreIndex:scoreIndex];
+                            }
+                            else if (rightRowScore == 5) {
+                                bestMove = rightRowScore;
+                                bestMove = [self checkIfBestMove:bestMove scoreToCheck:rightRowScore scoreIndex:scoreIndex];
+                            }
+                            else {
+                                [self setRandomIndexForComputerToMove];
+                            }
+                            break;
+                        default:
+                            NSLog (@"Integer out of range");
+                            break;
+                    }
+                }
+            }   
+        }
+    }
+    NSLog(@"Best Move Index:%li", (long)self.indexOfSquareToMove);
+}
+
+- (NSInteger)checkIfBestMove: (NSInteger)bestMove scoreToCheck:(NSInteger)scoreToCheck scoreIndex:(int)scoreIndex {
+
+    if (bestMove == 10) {
+        self.indexOfSquareToMove = scoreIndex;
+        return bestMove;
+    }
+    else {
+        return bestMove = scoreToCheck;
+    }
+}
+
+- (void)setRandomIndexForComputerToMove {
+    NSMutableArray *validMovesIndexesArray = [[NSMutableArray alloc] init];
+
+    for (int i = 0; i < self.labelsArray.count; i++) {
+        UILabel *currentLabel = [self.labelsArray objectAtIndex:i];
+        if ([currentLabel.text isEqualToString:@""]) {
+            int validLabelIndex = (int)[self.labelsArray indexOfObject:currentLabel];
+            NSLog(@"NE@WDF %ld", (long)validLabelIndex);
+            [validMovesIndexesArray addObject:[NSNumber numberWithInteger:validLabelIndex]];
+        }
+    }
+    NSNumber *newIndex;
+
+    if (validMovesIndexesArray.count > 0) {
+        int randomNum = arc4random() % 8;
+        NSLog(@"randomNumInt: %i", randomNum);
+
+        newIndex = [validMovesIndexesArray objectAtIndex:0];
+
+        for (int i = 0; i < validMovesIndexesArray.count; i++) {
+            UILabel *newIndexLabel = [self.labelsArray objectAtIndex:i];
+
+            if ([newIndexLabel.text isEqualToString:@"X"]) {
+                self.indexOfSquareToMove = [newIndex integerValue];
+                NSLog(@"Front door %i", (int)self.indexOfSquareToMove);
+            } else if ([newIndexLabel.text isEqualToString:@"O"]) {
+                self.indexOfSquareToMove = [newIndex integerValue];
+                NSLog(@"Front door %i", (int)self.indexOfSquareToMove);
+            }
+        }
+    }
+}
+
+- (NSArray *)getBoardScore {
+    NSMutableArray *boardScoreArray = [[NSMutableArray alloc] init];
+    for (int i = 0; i < self.ticTacToeBoard.count; i++) {
+        UILabel *labelAtCurrentIndex = [self.labelsArray objectAtIndex:i];
+        if ([labelAtCurrentIndex.text isEqualToString:@"X"]) {
+            [boardScoreArray addObject:[NSNumber numberWithInt:self.playerScore]];
+        }
+        else if ([labelAtCurrentIndex.text isEqualToString:@"O"]) {
+            [boardScoreArray addObject:[NSNumber numberWithInt:self.computerScore]];
+        }
+        else {
+            [boardScoreArray addObject:[NSNumber numberWithInt:0]];
+        }
+    }
+    NSLog(@"%@", boardScoreArray);
+    return boardScoreArray;
+}
+
+- (NSInteger)calculateRowScore: (NSArray *)boardScore
+                     rowSquareOne:(int)rowSquareOne
+                     rowSquareTwo:(int)rowSquareTwo
+                   rowSquareThree:(int)rowSquareThree {
+    // 0, 1, 2
+    NSInteger firstSquareScore = [[boardScore objectAtIndex:rowSquareOne] integerValue];
+    NSInteger secondSquareScore = [[boardScore objectAtIndex:rowSquareTwo] integerValue];
+    NSInteger thirdSquareScore = [[boardScore objectAtIndex:rowSquareThree] integerValue];
+
+    NSInteger rowScore = firstSquareScore + secondSquareScore + thirdSquareScore;
+
+    return rowScore;
+}
+
 - (NSString *)whoWon {
     NSString *winner = @"No Winner";
-    NSString *playerOne = @"x";
-    NSString *playerTwo = @"o";
+    NSString *playerOne = @"X";
+    NSString *playerTwo = @"O";
 
     if ([[self checkWhichPlayerWon:playerOne playerNumberString:@"1"] isEqualToString:playerOne]) {
         winner = playerOne;
@@ -214,9 +690,11 @@ const int kTurnTimerValue = 10;
     }
 
     if ([winner isEqualToString:playerOne]) {
+        self.hasGameBegun = NO;
         [self showWinnerAlert:winner];
-    } else if ([winner isEqualToString:playerTwo])
-    {
+    }
+    else if ([winner isEqualToString:playerTwo]) {
+        self.hasGameBegun = NO;
         [self showWinnerAlert:winner];
     }
 
@@ -228,9 +706,9 @@ const int kTurnTimerValue = 10;
 - (void)showWinnerAlert: (NSString *)winner {
     UIAlertView *alertView = [[UIAlertView alloc] init];
     alertView.delegate = self;
-    if ([winner isEqualToString:@"x"]) {
+    if ([winner isEqualToString:@"X"]) {
         alertView.title = @"Player One Wins!";
-    } else if ([winner isEqualToString:@"o"]) {
+    } else if ([winner isEqualToString:@"O"]) {
         alertView.title = @"Player Two Wins!";
     } else if ([winner isEqualToString:@"Tie!"]) {
         alertView.title = @"Tie!";
@@ -305,6 +783,7 @@ const int kTurnTimerValue = 10;
         return player;
     }
     else {
+
         return @"No Winner";
     }
 }
@@ -336,27 +815,22 @@ const int kTurnTimerValue = 10;
     }
 }
 
-- (void)resetBoard {
-    int counter = 0;
-
-    for (UILabel *label in self.labelsArray) {
-        label.text = @"  ";
-        self.ticTacToeBoard[counter] = @"0";
-        counter++;
-    }
-    [self updateWhichPlayerLabel:@"Player One"];
-    self.labelXOToDrag.textColor = [UIColor blueColor];
-    self.labelXOToDrag.text = @"X";
-}
-
 - (IBAction)onDrag:(UIPanGestureRecognizer *)panGesture {
     CGPoint point = [panGesture locationInView:self.view];
     self.labelXOToDrag.center = point;
 
+    /* // Uncomment this to make the labelXOToDrag only when you're touching it,
+     // But for some reason in makes the lagging really buggy and slow so I'm sticking with
+     // the two lines above.
+    if (CGRectContainsPoint(self.labelXOToDrag.frame, point)) {
+        self.labelXOToDrag.center = point;
+    } */
+
+
     if (panGesture.state == UIGestureRecognizerStateEnded) {
 
         for (UILabel *label in self.labelsArray) {
-            if (CGRectContainsPoint(label.frame, point) && [label.text isEqualToString:@"  "]) {
+            if (CGRectContainsPoint(label.frame, point) && [label.text isEqualToString:@""]) {
                 if ([self.whichPlayerLabel.text isEqualToString:@"Player One"]) {
                     [self getIndexOfTappedSquare:label];
                     [self dragLabelOnToBoardForPlayer:@"Player One" playerColor:[UIColor blueColor] playerLetter:@"X" label:label];
